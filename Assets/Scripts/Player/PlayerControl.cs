@@ -9,6 +9,7 @@ public class PlayerControl : MonoBehaviour
     public Transform animationPic;//动画图片
     public Transform playerBody;//身体主题
     public Transform weapon;//武器引用
+    public Rigidbody2D rigidbody;//刚体组件
     [Header("属性")]
     public bool isMoving = false;
     public Vector2 MoveWay;//移动方向
