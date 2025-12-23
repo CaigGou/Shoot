@@ -106,8 +106,9 @@ public class PlayerControl : MonoBehaviour
             MoveSpeed = System.Math.Max(MoveSpeed - Time.fixedDeltaTime * MoveAcceleration*1.2f, 0f);
         }
         
-        //进行位置修改
-        transform.position += new Vector3(MoveWay.x*MoveSpeed*Time.fixedDeltaTime,MoveWay.y*MoveSpeed * Time.fixedDeltaTime,0);
+        //进行速度修改
+        //transform.position += new Vector3(MoveWay.x*MoveSpeed*Time.fixedDeltaTime,MoveWay.y*MoveSpeed * Time.fixedDeltaTime,0);
+        rigidbody.velocity = MoveWay * MoveSpeed;
     }
 
     /// <summary>
