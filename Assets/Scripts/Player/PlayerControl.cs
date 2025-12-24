@@ -17,21 +17,25 @@ public class PlayerControl : MonoBehaviour
     public float MoveMaxSpeed;//最大移动速度
     public float MoveAcceleration;//移动加速度
 
-    bool inGround=true;//是否在地面上
+    public float AttackCD;//攻击CD
+    public float AttackSpeed = 1;//攻击速度（CD = AttackCD*AttackSpeed）
+    bool isCanAttack = true;//是否可以进行攻击
+
+    bool inGround = true;//是否在地面上
 
 
 
 
     private void Awake()
     {
-       
+
     }
     void Start()
     {
-     
+
         //转向动画数据初始化
-        TurningWay = new Vector3(1,1,1);
-        Turning = playerBody.DOScale(TurningWay,0.15f).SetAutoKill(false).Pause();
+        TurningWay = new Vector3(1, 1, 1);
+        Turning = playerBody.DOScale(TurningWay, 0.15f).SetAutoKill(false).Pause();
     }
 
     // Update is called once per frame
@@ -52,22 +56,26 @@ public class PlayerControl : MonoBehaviour
     /// <summary>
     /// 输入处理
     /// </summary>
-    void InputPorcessing() {
+    void InputPorcessing()
+    {
         //确定移动方向
         int way_y = 0;
         int way_x = 0;
-        if (Input.GetKey(KeyCode.W)) {
-            
+        if (Input.GetKey(KeyCode.W))
+        {
+
             way_y += 1;
         }
-        if (Input.GetKey(KeyCode.S)) {
+        if (Input.GetKey(KeyCode.S))
+        {
             way_y -= 1;
         }
         if (Input.GetKey(KeyCode.A))
         {
             way_x -= 1;
         }
-        if (Input.GetKey(KeyCode.D)){
+        if (Input.GetKey(KeyCode.D))
+        {
             way_x += 1;
         }
         MoveWay = new Vector2(way_x, way_y);
@@ -77,14 +85,21 @@ public class PlayerControl : MonoBehaviour
             isMoving = true;
             StartMove();
         }
-        else {
+        else
+        {
             isMoving = false;
             EndMove();
         }
         //确定跳跃
-        if (Input.GetKeyDown(KeyCode.Space)) {
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
             JumpProcessing();
-            
+
+        }
+        //如果鼠标处于点击状态
+        if (Input.GetMouseButtonDown(0))
+        {
+
         }
 
     }
@@ -96,16 +111,20 @@ public class PlayerControl : MonoBehaviour
     /// <summary>
     /// 移动状态处理
     /// </summary>
-    void MoveProcessing() {
-        if (isMoving) {
-            if (MoveSpeed < MoveMaxSpeed) {
-                MoveSpeed = System.Math.Min(MoveSpeed+Time.fixedDeltaTime*MoveAcceleration,MoveMaxSpeed);
+    void MoveProcessing()
+    {
+        if (isMoving)
+        {
+            if (MoveSpeed < MoveMaxSpeed)
+            {
+                MoveSpeed = System.Math.Min(MoveSpeed + Time.fixedDeltaTime * MoveAcceleration, MoveMaxSpeed);
             }
         }
-        else {
-            MoveSpeed = System.Math.Max(MoveSpeed - Time.fixedDeltaTime * MoveAcceleration*1.2f, 0f);
+        else
+        {
+            MoveSpeed = System.Math.Max(MoveSpeed - Time.fixedDeltaTime * MoveAcceleration * 1.2f, 0f);
         }
-        
+
         //进行速度修改
         //transform.position += new Vector3(MoveWay.x*MoveSpeed*Time.fixedDeltaTime,MoveWay.y*MoveSpeed * Time.fixedDeltaTime,0);
         rigidbody.velocity = MoveWay * MoveSpeed;
@@ -114,7 +133,8 @@ public class PlayerControl : MonoBehaviour
     /// <summary>
     /// 跳跃处理
     /// </summary>
-    void JumpProcessing() {
+    void JumpProcessing()
+    {
         //动画处理
         Jump();
         //设置在地面状态为false
@@ -124,37 +144,41 @@ public class PlayerControl : MonoBehaviour
     /// <summary>
     /// 设置在地面上
     /// </summary>
-    public void SetInGround() {
+    public void SetInGround()
+    {
         inGround = true;
-        
+
     }
 
 
 
     Tweener Turning;//转向动画
-    Vector3 TurningWay = new Vector3(1,1,1);//转向方向
+    Vector3 TurningWay = new Vector3(1, 1, 1);//转向方向
     /// <summary>
     /// 转向处理
     /// </summary>
-    void TurningProcessing() {
+    void TurningProcessing()
+    {
         //获取鼠位置
         if (Input.mousePosition.x - Screen.width / 2 > 0)
         {
             if (TurningWay.x == -1)
             {
-                
-                TurningWay = new Vector3(1,1,1);
+
+                TurningWay = new Vector3(1, 1, 1);
                 Turning.ChangeStartValue(playerBody.lossyScale).ChangeEndValue(TurningWay).Restart();
             }
         }
-        else if(Input.mousePosition.x - Screen.width / 2 < 0) {
-            if (TurningWay.x == 1) {
-               
-                TurningWay = new Vector3(-1,1,1);
+        else if (Input.mousePosition.x - Screen.width / 2 < 0)
+        {
+            if (TurningWay.x == 1)
+            {
+
+                TurningWay = new Vector3(-1, 1, 1);
                 Turning.ChangeStartValue(playerBody.lossyScale).ChangeEndValue(TurningWay).Restart();
             }
         }
-        
+
     }
 
 
@@ -162,27 +186,31 @@ public class PlayerControl : MonoBehaviour
     /// <summary>
     /// 开始移动
     /// </summary>
-    public void StartMove() {
+    public void StartMove()
+    {
         isMoving = true;
-        animation_control.SetBool("Move",true);
-    
+        animation_control.SetBool("Move", true);
+
     }
     /// <summary>
     /// 结束移动
     /// </summary>
-    public void EndMove() {
+    public void EndMove()
+    {
         isMoving = false;
-        animation_control.SetBool("Move",false);
+        animation_control.SetBool("Move", false);
     }
 
     /// <summary>
     /// 跳跃
     /// </summary>
-    public void Jump() {
+    public void Jump()
+    {
         animation_control.SetTrigger("Jump");
-        StartCoroutine(EndTrigger(animation_control,"Jump"));
+        StartCoroutine(EndTrigger(animation_control, "Jump"));
     }
-    IEnumerator EndTrigger(Animator animator,string name) {
+    IEnumerator EndTrigger(Animator animator, string name)
+    {
         yield return new WaitForFixedUpdate();
         animator?.ResetTrigger(name);
     }
@@ -194,12 +222,45 @@ public class PlayerControl : MonoBehaviour
     /// <summary>
     /// 武器跟随旋转
     /// </summary>
-    void WeaponRotate() {
+    void WeaponRotate()
+    {
         //return;
         //计算角度
-        Vector3 Way = new Vector3(Input.mousePosition.x-Screen.width/2f,Input.mousePosition.y-Screen.height/2f,0);
-        float angle = Vector3.SignedAngle(new Vector3(TurningWay.x,0,0), Way,Vector3.forward);
-        weapon.localEulerAngles = new Vector3(0,0, angle*TurningWay.x);
+        Vector3 Way = new Vector3(Input.mousePosition.x - Screen.width / 2f, Input.mousePosition.y - Screen.height / 2f, 0);
+        float angle = Vector3.SignedAngle(new Vector3(TurningWay.x, 0, 0), Way, Vector3.forward);
+        weapon.localEulerAngles = new Vector3(0, 0, angle * TurningWay.x);
+    }
+
+    /// <summary>
+    /// 攻击CD进行冷却
+    /// </summary>
+    void AttackCDCooling()
+    {
+        if (isCanAttack == false)
+        {
+            return;
+        }
+        isCanAttack = false;
+        DOVirtual.DelayedCall(AttackCD * AttackSpeed, ResetAttackState);
+    }
+
+    /// <summary>
+    /// 重新设置攻击状态
+    /// </summary>
+    void ResetAttackState()
+    {
+        isCanAttack = true;
+    }
+
+    #endregion
+
+    #region 攻击
+    public void Acctck() {
+        if (isCanAttack) {
+            //执行攻击函数
+            //进行CD冷却
+            AttackCDCooling();
+        }
     }
 
     #endregion
